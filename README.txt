@@ -54,12 +54,18 @@ To learn how to use this library, it is best to study its unit test source code 
 
 Example usage::
 
-        # Initialize Zoho CRM api connection
+        # Import CRM connector class
+        from mfabrik.zoho.crm import CRM
+        from mfabrik.zoho.core import ZohoException
+
+        # Initialize Zoho CRM API connection
+        # You need valid Zoho credentials and API key for this.
         # You get necessary data from Zoho > Setup > Admin > Developer key
-        self.crm = CRM(username=self.username, password=self.password, apikey=self.apikey)
+        crm = CRM(username="myusername", password="foobar", apikey="12312312312312312323")
 
         # Open connection can be used to make as many as possible API calls
-        self.crm.open()
+        # This will raise ZohoException if credentials are incorrect.
+        crm.open()
 
         # Lead is just a bunch of dictionaried data
         # For possible lead parameters see crm.py.
@@ -72,12 +78,24 @@ Example usage::
 
         # Insert a new lead to Zoho CRM lead database.
         # We support multiple leads per call, so we need to listify our one lead first.
-        self.crm.insert_records([lead])
+        crm.insert_records([lead]) # This will raise ZohoException if lead data is invalid
+        
+.. note::
+        
+        Some calls (e.g. delete) seem to have delay and the changes might not be instantly
+        reflected in the next API call (getRecords).
+        
+        
+Logging
+=======
+
+Python `logging` module logger *Zoho API* is used to output API traffic
+on DEBUG log level.
 
 Source code
 -----------
 
-*        
+* http://github.com/miohtama/mfabrik.zoho
 
 Commercial development
 -----------------------

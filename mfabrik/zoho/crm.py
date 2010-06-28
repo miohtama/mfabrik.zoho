@@ -150,7 +150,7 @@ class CRM(Connection):
         self.ensure_opened()
     
         post_params = {}
-        post_params[id] = id
+        post_params["id"] = id
         post_params.update(parameters)
         
         response = self.do_call("http://crm.zoho.com/crm/private/xml/Leads/deleteRecords", post_params)

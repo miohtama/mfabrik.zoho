@@ -1,0 +1,112 @@
+Introduction
+------------
+
+*mfabrik.zoho* package provides Python classes for making easy Zoho API calls. 
+They allow you to integrate `Zoho web application data <http://www.zoho.com>`
+to your Python software.  
+
+Features
+--------
+
+* Creating Zoho API session a.k.a ticket
+
+* Extendable API using a base class architecture
+
+* Logging all incoming and outgoing API traffic with Zoho
+
+* Support Python 2.4, 2.5 and 2.6 (2.4 needs additional lxml library installed)
+
+* i18n non-ASCII letter compatible
+
+* Unit tests
+
+*mfabrik.zoho* is intended to use for machine-to-machine communication and
+will work with any web framework, like Plone, Django, Google App Engine.
+
+To communicate with Zoho you need username, password and API KEY.
+For further information, see *Setup > Admin > Developer key* in 
+your Zoho application.
+
+API support
+-----------
+
+Currently out of box support includes:
+
+* CRM apis: insert_leads, get_records, delete_lead
+
+You can easily wrap Zoho API calls you need using this library.
+Please contribute patches to the package.
+
+Installation
+------------
+
+To install mfabrik.zoho to your system-wide Python 
+do as below. 
+
+Example (UNIX)::
+
+        sudo easy_install lxml simplejson mfabrik.zoho
+        
+Usage
+-----
+
+To learn how to use this library, it is best to study its unit test source code (tests.py).
+
+Example usage::
+
+        # Initialize Zoho CRM api connection
+        # You get necessary data from Zoho > Setup > Admin > Developer key
+        self.crm = CRM(username=self.username, password=self.password, apikey=self.apikey)
+
+        # Open connection can be used to make as many as possible API calls
+        self.crm.open()
+
+        # Lead is just a bunch of dictionaried data
+        # For possible lead parameters see crm.py.
+        
+        lead = {
+            u"First Name" : u"Mikko",
+            u"Last Name" : u"Ohtamaa",
+            u"Company" : u"mFabrik Research Oy"   
+        }
+
+        # Insert a new lead to Zoho CRM lead database.
+        # We support multiple leads per call, so we need to listify our one lead first.
+        self.crm.insert_records([lead])
+
+Source code
+-----------
+
+*        
+
+Commercial development
+-----------------------
+
+This package is licensed under open source GPL license.
+If you wish to use this code in a commercial product, 
+relicense it or you are 
+looking for high quality Zoho/Python support, please contact
+`mFabrik Research <mailto:research@mfabrik.com>`.
+Our top class Python developers are ready to serve you.
+
+Further reading
+---------------
+
+* Zoho CRM API: http://zohocrmapi.wiki.zoho.com/API-Methods.html
+
+* API update notes: http://forums.zoho.com/topic/zoho-crm-api-update-important
+
+Author
+------
+
+`mFabrik Research Oy <mailto:info@mfabrik.com>`_ - Python and Plone professionals for hire.
+
+* `mFabrik web site <http://mfabrik.com>`_ 
+
+* `mFabrik mobile site <http://mfabrik.mobi>`_ 
+
+* `Blog <http://blog.mfabrik.com>`_
+
+* `More about Plone <http://mfabrik.com/technology/technologies/content-management-cms/plone>`_ 
+
+       

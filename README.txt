@@ -2,8 +2,8 @@ Introduction
 ------------
 
 *mfabrik.zoho* package provides Python classes for making easy Zoho API calls. 
-They allow you to integrate `Zoho web application data <http://www.zoho.com>`
-to your Python software.  
+They allow you to integrate `Zoho web application data <http://www.zoho.com>`_
+into your Python software.  
 
 Features
 --------
@@ -14,11 +14,11 @@ Features
 
 * Logging all incoming and outgoing API traffic with Zoho
 
-* Support Python 2.4, 2.5 and 2.6 (2.4 needs additional lxml library installed)
+* Support Python 2.4, 2.5 and 2.6 (2.4 needs additional lxml and simplejson libraries installed)
 
-* i18n non-ASCII letter compatible
+* Compatible with non-ASCII or Unicode letters
 
-* Unit tests
+* Unit tests to guarantee the high quality of the code
 
 *mfabrik.zoho* is intended to use for machine-to-machine communication and
 will work with any web framework, like Plone, Django, Google App Engine.
@@ -32,7 +32,7 @@ API support
 
 Currently out of box support includes:
 
-* CRM apis: insert_leads, get_records, delete_lead
+* CRM apis: insert_records, get_records, delete_lead
 
 You can easily wrap Zoho API calls you need using this library.
 Please contribute patches to the package.
@@ -45,7 +45,11 @@ do as below.
 
 Example (UNIX)::
 
-        sudo easy_install lxml simplejson mfabrik.zoho
+        sudo easy_install mfabrik.zoho
+        
+Example (UNIX, Python 2.4)::
+
+        sudo easy_install mfabrik.zoho lxml simplejson 
         
 Usage
 -----
@@ -65,6 +69,8 @@ Example usage::
 
         # Open connection can be used to make as many as possible API calls
         # This will raise ZohoException if credentials are incorrect.
+        # Also IOError or URLError will be raised if you the connection to Zoho servers
+        # does not work.
         crm.open()
 
         # Lead is just a bunch of dictionaried data
@@ -104,8 +110,8 @@ This package is licensed under open source GPL license.
 If you wish to use this code in a commercial product, 
 relicense it or you are 
 looking for high quality Zoho/Python support, please contact
-`mFabrik Research <mailto:research@mfabrik.com>`.
-Our top class Python developers are ready to serve you.
+`mFabrik Research <mailto:research@mfabrik.com>`_.
+Our top class Python developers are ready to help you with your software development.
 
 Further reading
 ---------------
@@ -124,7 +130,5 @@ Author
 * `mFabrik mobile site <http://mfabrik.mobi>`_ 
 
 * `Blog <http://blog.mfabrik.com>`_
-
-* `More about Plone <http://mfabrik.com/technology/technologies/content-management-cms/plone>`_ 
 
        

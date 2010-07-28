@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.0 - 1.0.1
+-----------
+
+Fixed MANIFEST.in file - setuptools was ignoring docs/ by default
+
 1.0
 -------------------
 

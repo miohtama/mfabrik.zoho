@@ -84,7 +84,10 @@ Example usage::
 
         # Insert a new lead to Zoho CRM lead database.
         # We support multiple leads per call, so we need to listify our one lead first.
-        crm.insert_records([lead]) # This will raise ZohoException if lead data is invalid
+        lead_ids = crm.insert_records([lead]) # This will raise ZohoException if lead data is invalid
+        
+        # Lead ids is list of newly created leads
+        # Store lead ids for future reference
         
 .. note::
         

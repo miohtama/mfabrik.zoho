@@ -27,6 +27,10 @@ class CRM(Connection):
         """ Make sure that we get "succefully" response.
         
         Throw exception of the response looks like something not liked.
+        
+        @raise: ZohoException if any error
+        
+        @return: Always True
         """
 
         # Example response
@@ -55,9 +59,9 @@ class CRM(Connection):
         @param extra_post_parameters: Parameters appended to the HTTP POST call. 
             Described in Zoho CRM API.
         
+        @return: List of record ids which were created by insert recoreds
         """        
 
-        # Ba
         self.ensure_opened()
         
         root = etree.Element("Leads")
@@ -88,12 +92,14 @@ class CRM(Connection):
         post.update(extra_post_parameters)
         
         response = self.do_xml_call("http://crm.zoho.com/crm/private/xml/Leads/insertRecords", post, root)
+                
+        return self.get_inserted_records(response)
         
-        if self.check_successful_xml(response):
-            return self.get_inserted_records(response)
     
     def get_inserted_records(self, response):
-        
+        """
+        @return: List of record ids which were created by insert recoreds
+        """
         root = etree.fromstring(response)
         records = []
         for result in root.iter("result"):
@@ -149,13 +155,10 @@ class CRM(Connection):
                 
     def delete_record(self, id, parameters={}):
         """ Delete one record from Zoho CRM.
-        
-        
-        
+                        
         @param id: Record id
         
-        @param parameters: Extra HTTP post parameters
-        
+        @param parameters: Extra HTTP post parameters        
         """
         
         self.ensure_opened()

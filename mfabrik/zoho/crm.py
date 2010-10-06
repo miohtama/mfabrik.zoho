@@ -10,13 +10,9 @@ __license__ = "GPL"
 __docformat__ = "Epytext"
 
 try:
-    from xml import etree
+    from lxml import etree
 except ImportError:
-    # Python 2.4
-    try:
-        from lxml import etree
-    except ImportError:
-        raise RuntimeError("lxml or xml libraries or not available")
+    raise RuntimeError("lxml library not available")
     
 from core import Connection, ZohoException, decode_json
 
@@ -43,9 +39,11 @@ class CRM(Connection):
         for error in root.iter("error"):
             for message in error.iter("message"):
                 raise ZohoException(message.text)
+        
+        return True
     
     def insert_records(self, leads, extra_post_parameters={}):
-        """ Insert one new lead to Zoho CRM database.
+        """ Insert new leads to Zoho CRM database.
         
         The contents of the lead parameters can be defined in Zoho CRM itself.
         
@@ -91,8 +89,21 @@ class CRM(Connection):
         
         response = self.do_xml_call("http://crm.zoho.com/crm/private/xml/Leads/insertRecords", post, root)
         
-
-        self.check_successful_xml(response)
+        if self.check_successful_xml(response):
+            return self.get_inserted_records(response)
+    
+    def get_inserted_records(self, response):
+        
+        root = etree.fromstring(response)
+        records = []
+        for result in root.iter("result"):
+            for record in result.iter("recorddetail"):
+                record_detail = {}
+                for fl in record.iter("FL"):
+                    record_detail[fl.get("val")] = fl.text
+                records.append(record_detail)
+        return records
+        
     
     def get_records(self, selectColumns='leads(First Name,Last Name,Company)', parameters={}):
         """ 

@@ -14,13 +14,9 @@ import urllib, urllib2
 import logging
 
 try:
-    from xml import etree
+    from lxml import etree
 except ImportError:
-    # Python 2.4
-    try:
-        from lxml import etree
-    except ImportError:
-        raise RuntimeError("lxml or xml libraries or not available")
+    raise RuntimeError("lxml library not available")
     
 try:
     import json

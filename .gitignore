@@ -1,2 +1,4 @@
 *.egg
 *.egg-info
+.project
+.pyproject

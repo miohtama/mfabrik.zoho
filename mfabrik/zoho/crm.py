@@ -9,10 +9,13 @@ __author__ = "Mikko Ohtamaa <mikko@mfabrik.com>"
 __license__ = "GPL"
 __docformat__ = "Epytext"
 
-try:
-    from lxml import etree
-except ImportError:
-    raise RuntimeError("lxml library not available")
+#try:
+#    from lxml import etree
+#except ImportError:
+#    raise RuntimeError("lxml library not available")
+
+from xml import etree
+from xml.etree.ElementTree import Element, tostring, fromstring
     
 from core import Connection, ZohoException, decode_json
 
@@ -36,12 +39,13 @@ class CRM(Connection):
         # Example response
         # <response uri="/crm/private/xml/Leads/insertRecords"><result><message>Record(s) added successfully</message><recorddetail><FL val="Id">177376000000142007</FL><FL val="Created Time">2010-06-27 21:37:20</FL><FL val="Modified Time">2010-06-27 21:37:20</FL><FL val="Created By">Ohtamaa</FL><FL val="Modified By">Ohtamaa</FL></recorddetail></result></response>
 
-        root = etree.fromstring(response)
-        
+        root = fromstring(response)
+            
         # Check error response
         # <response uri="/crm/private/xml/Leads/insertRecords"><error><code>4401</code><message>Unable to populate data, please check if mandatory value is entered correctly.</message></error></response>
-        for error in root.iter("error"):
-            for message in error.iter("message"):
+        for error in root.findall("error"):
+            print "Got error"
+            for message in error.findall("message"):
                 raise ZohoException(message.text)
         
         return True
@@ -64,13 +68,13 @@ class CRM(Connection):
 
         self.ensure_opened()
         
-        root = etree.Element("Leads")
+        root = Element("Leads")
 
         # Row counter
         no = 1
 
         for lead in leads:
-            row = etree.Element("row", no=str(no))
+            row = Element("row", no=str(no))
             root.append(row)
 
             assert type(lead) == dict, "Leads must be dictionaries inside a list, got:" + str(type(lead))
@@ -78,7 +82,7 @@ class CRM(Connection):
             for key, value in lead.items():
                 # <FL val="Lead Source">Web Download</FL>
                 # <FL val="First Name">contacto 1</FL>
-                fl = etree.Element("fl", val=key)
+                fl = Element("fl", val=key)
                 fl.text = value
                 row.append(fl)
                 
@@ -92,6 +96,8 @@ class CRM(Connection):
         post.update(extra_post_parameters)
         
         response = self.do_xml_call("http://crm.zoho.com/crm/private/xml/Leads/insertRecords", post, root)
+
+        self.check_successful_xml(response)
                 
         return self.get_inserted_records(response)
         
@@ -100,12 +106,13 @@ class CRM(Connection):
         """
         @return: List of record ids which were created by insert recoreds
         """
-        root = etree.fromstring(response)
+        root = fromstring(response)
+        
         records = []
-        for result in root.iter("result"):
-            for record in result.iter("recorddetail"):
+        for result in root.findall("result"):
+            for record in result.findall("recorddetail"):
                 record_detail = {}
-                for fl in record.iter("FL"):
+                for fl in record.findall("FL"):
                     record_detail[fl.get("val")] = fl.text
                 records.append(record_detail)
         return records

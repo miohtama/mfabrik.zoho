@@ -13,11 +13,14 @@ import urllib, urllib2
 
 import logging
 
-try:
-    from lxml import etree
-except ImportError:
-    raise RuntimeError("lxml library not available")
+#try:
+#    from lxml import etree
+#except ImportError:
+#    raise RuntimeError("lxml library not available")
     
+from xml import etree
+from xml.etree.ElementTree import Element, tostring, fromstring
+
 try:
     import json
 except ImportError:
@@ -158,7 +161,7 @@ class Connection(object):
         """
         
         parameters = parameters.copy()
-        parameters["xmlData"] = etree.tostring(root)
+        parameters["xmlData"] = tostring(root)
         return self.do_call(url, parameters)
 
     def do_call(self, url, parameters):

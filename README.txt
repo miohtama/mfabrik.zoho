@@ -76,6 +76,8 @@ Example usage::
         # Lead is just a bunch of dictionaried data
         # For possible lead parameters see crm.py.
         
+        # Zoho default compulsory fields: Last Name, Company
+        
         lead = {
             u"First Name" : u"Mikko",
             u"Last Name" : u"Ohtamaa",
@@ -84,10 +86,13 @@ Example usage::
 
         # Insert a new lead to Zoho CRM lead database.
         # We support multiple leads per call, so we need to listify our one lead first.
-        lead_ids = crm.insert_records([lead]) # This will raise ZohoException if lead data is invalid
+        responses = crm.insert_records([lead]) # This will raise ZohoException if lead data is invalid
         
-        # Lead ids is list of newly created leads
-        # Store lead ids for future reference
+        # list of responses. one response is {'Modified Time': '2010-10-07 13:24:49', 'Created By': 'Developer', 'Modified By': 'Developer', 'Id': '177376000000253053', 'Created Time': '2010-10-07 13:24:49'}
+        # At least one response is guaranteed, otherwise an exception is raised
+        
+        lead_id = responses[0]["Id"]
+        
         
 .. note::
         

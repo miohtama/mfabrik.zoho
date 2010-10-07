@@ -93,6 +93,9 @@ Example usage::
         
         lead_id = responses[0]["Id"]
         
+
+Special field *Lead Owner* must be the registered email fo Zoho CRM user.        
+        
         
 .. note::
         

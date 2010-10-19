@@ -9,14 +9,17 @@ __author__ = "Mikko Ohtamaa <mikko@mfabrik.com>"
 __license__ = "GPL"
 __docformat__ = "Epytext"
 
-#try:
-#    from lxml import etree
-#except ImportError:
-#    raise RuntimeError("lxml library not available")
 
-from xml import etree
-from xml.etree.ElementTree import Element, tostring, fromstring
-    
+try:
+    from xml import etree
+    from xml.etree.ElementTree import Element, tostring, fromstring
+except ImportError:
+    try:
+        from lxml import etree
+        from lxml.etree import Element, tostring, fromstring
+    except ImportError:
+        raise RuntimeError("XML library not available:  no etree, no lxml")
+   
 from core import Connection, ZohoException, decode_json
 
 class CRM(Connection):

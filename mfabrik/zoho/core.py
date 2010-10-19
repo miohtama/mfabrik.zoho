@@ -13,13 +13,17 @@ import urllib, urllib2
 
 import logging
 
-#try:
-#    from lxml import etree
-#except ImportError:
-#    raise RuntimeError("lxml library not available")
-    
-from xml import etree
-from xml.etree.ElementTree import Element, tostring, fromstring
+try:
+    from xml import etree
+    from xml.etree.ElementTree import Element, tostring, fromstring
+except ImportError:
+     try:
+         from lxml import etree
+         from lxml.etree import  Element, tostring, fromstring
+     except ImportError:
+         print "XML library not available:  no etree, no lxml"
+         raise
+   
 
 try:
     import json

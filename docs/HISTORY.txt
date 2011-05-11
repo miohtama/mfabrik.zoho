@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.0.2 - 1.1
+------------------
+
+* Changed protocol to https, as per Zoho API changes [miohtama]
+
 1.0.1 - 1.0.2
 -------------
 

@@ -98,7 +98,7 @@ class CRM(Connection):
 
         post.update(extra_post_parameters)
         
-        response = self.do_xml_call("http://crm.zoho.com/crm/private/xml/Leads/insertRecords", post, root)
+        response = self.do_xml_call("https://crm.zoho.com/crm/private/xml/Leads/insertRecords", post, root)
 
         self.check_successful_xml(response)
                 
@@ -146,7 +146,7 @@ class CRM(Connection):
         
         post_params.update(parameters)
 
-        response = self.do_call("http://crm.zoho.com/crm/private/json/Leads/getRecords", post_params)
+        response = self.do_call("https://crm.zoho.com/crm/private/json/Leads/getRecords", post_params)
         
         # raw data looks like {'response': {'result': {'Leads': {'row': [{'FL': [{'content': '177376000000142085', 'val': 'LEADID'}, ...
         data =  decode_json(response)
@@ -177,7 +177,7 @@ class CRM(Connection):
         post_params["id"] = id
         post_params.update(parameters)
         
-        response = self.do_call("http://crm.zoho.com/crm/private/xml/Leads/deleteRecords", post_params)
+        response = self.do_call("https://crm.zoho.com/crm/private/xml/Leads/deleteRecords", post_params)
         
         self.check_successful_xml(response)
         

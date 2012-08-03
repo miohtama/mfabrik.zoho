@@ -9,7 +9,7 @@
     
     * ZOHO_PASSWORD
     
-    * ZOHO_APIKEY
+    * ZOHO_AUTHTOKEN
     
     Since you are probably using proudction Zoho database to testing, 
     all tests include clean-up functions which should clear all test data
@@ -47,17 +47,17 @@ class TestCRM(unittest.TestCase):
         
         self.username = os.environ.get("ZOHO_USERNAME", None)
         self.password = os.environ.get("ZOHO_PASSWORD", None)
-        self.apikey = os.environ.get("ZOHO_APIKEY", None)
+        self.authtoken = os.environ.get("ZOHO_AUTHTOKEN", None)
         
-        if self.username and self.password and self.apikey:
+        if self.username and self.password and self.authtoken:
             # All ok
             pass
         else:
-            raise RuntimeError("Please set-up unit-test environment variables: ZOHO_USERNAME, ZOHO_PASSWORD and ZOHO_APIKEY to run tests")
+            raise RuntimeError("Please set-up unit-test environment variables: ZOHO_USERNAME, ZOHO_PASSWORD and ZOHO_AUTHTOKEN to run tests")
 
         # Initialize Zoho CRM api connection
         # You get necessary data from Zoho > Setup > Admin > Developer key
-        self.crm = CRM(username=self.username, password=self.password, apikey=self.apikey)
+        self.crm = CRM(username=self.username, password=self.password, authtoken=self.authtoken, scope="crmapi")
 
         # Open connection can be used to make as many as possible API calls
         self.crm.open()

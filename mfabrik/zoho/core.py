@@ -56,13 +56,13 @@ class Connection(object):
     """
 
     
-    def __init__(self, username, password, apikey, extra_auth_params = {}, auth_url="https://accounts.zoho.com/login"):        
+    def __init__(self, username, password, authtoken, scope, extra_auth_params = {}, auth_url="https://accounts.zoho.com/login"):        
         """
         @param username: manifisto@mfabrik.com 
         
         @param password: xxxxxxx
         
-        @param apikey: Given by Zoho, string like 123123123-rVI20JVBveUOHIeRYWV5b5kQaMGWeIdlI$
+        @param authtoken: Given by Zoho, string like 123123123-rVI20JVBveUOHIeRYWV5b5kQaMGWeIdlI$
                 
         @param extra_auth_params: Dictionary of optional HTTP POST parameters passed to the login call
         
@@ -71,7 +71,8 @@ class Connection(object):
         """        
         self.username = username
         self.password = password
-        self.apikey = apikey
+        self.authtoken = authtoken
+        self.scope = scope
         # 
         self.auth_url = None
         
@@ -155,7 +156,7 @@ class Connection(object):
     def do_xml_call(self, url, parameters, root):
         """  Do Zoho API call with outgoing XML payload.
         
-        Ticket and apikey parameters will be added automatically.
+        Ticket and authtoken parameters will be added automatically.
         
         @param url: URL to be called
         
@@ -178,7 +179,8 @@ class Connection(object):
         # Do not mutate orginal dict
         parameters = parameters.copy()
         parameters["ticket"] = self.ticket
-        parameters["apikey"] = self.apikey
+        parameters["authtoken"] = self.authtoken
+        parameters["scope"] = self.scope
         
         stringify(parameters)
         

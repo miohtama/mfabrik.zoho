@@ -104,7 +104,7 @@ class Connection(object):
         }
 
         request_url = "https://accounts.zoho.com/login"
-        request = urllib2.Request(requestUrl, urllib.urlencode(params))
+        request = urllib2.Request(request_url, urllib.urlencode(params))
         body = urllib2.urlopen(request).read()
 
         data = self._parse_ticket_response(body)

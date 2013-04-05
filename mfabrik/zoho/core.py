@@ -26,7 +26,7 @@ except ImportError:
 
 
 try:
-    import json
+    import json as simplejson
 except ImportError:
     try:
         import simplejson

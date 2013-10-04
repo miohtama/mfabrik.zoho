@@ -25,33 +25,12 @@ from core import Connection, ZohoException, decode_json
 class CRM(Connection):
     """ CRM specific Zoho APIs mapped to Python """
     
+    """ Define the standard parameter for the XML data """
+    parameter_xml = 'xmlData'
+
     def get_service_name(self):
         """ Called by base class """
         return "ZohoCRM"
-    
-    def check_successful_xml(self, response):
-        """ Make sure that we get "succefully" response.
-        
-        Throw exception of the response looks like something not liked.
-        
-        @raise: ZohoException if any error
-        
-        @return: Always True
-        """
-
-        # Example response
-        # <response uri="/crm/private/xml/Leads/insertRecords"><result><message>Record(s) added successfully</message><recorddetail><FL val="Id">177376000000142007</FL><FL val="Created Time">2010-06-27 21:37:20</FL><FL val="Modified Time">2010-06-27 21:37:20</FL><FL val="Created By">Ohtamaa</FL><FL val="Modified By">Ohtamaa</FL></recorddetail></result></response>
-
-        root = fromstring(response)
-            
-        # Check error response
-        # <response uri="/crm/private/xml/Leads/insertRecords"><error><code>4401</code><message>Unable to populate data, please check if mandatory value is entered correctly.</message></error></response>
-        for error in root.findall("error"):
-            print "Got error"
-            for message in error.findall("message"):
-                raise ZohoException(message.text)
-        
-        return True
     
     def insert_records(self, leads, extra_post_parameters={}):
         """ Insert new leads to Zoho CRM database.
@@ -103,22 +82,6 @@ class CRM(Connection):
         self.check_successful_xml(response)
                 
         return self.get_inserted_records(response)
-        
-    
-    def get_inserted_records(self, response):
-        """
-        @return: List of record ids which were created by insert recoreds
-        """
-        root = fromstring(response)
-        
-        records = []
-        for result in root.findall("result"):
-            for record in result.findall("recorddetail"):
-                record_detail = {}
-                for fl in record.findall("FL"):
-                    record_detail[fl.get("val")] = fl.text
-                records.append(record_detail)
-        return records
         
     
     def get_records(self, selectColumns='leads(First Name,Last Name,Company)', parameters={}):

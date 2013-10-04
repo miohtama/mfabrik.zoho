@@ -166,7 +166,7 @@ class Connection(object):
         """
 
         parameters = parameters.copy()
-        parameters["xmlData"] = tostring(root)
+        parameters[self.parameter_xml] = tostring(root)
         return self.do_call(url, parameters)
 
     def do_call(self, url, parameters):
@@ -178,7 +178,7 @@ class Connection(object):
         """
         # Do not mutate orginal dict
         parameters = parameters.copy()
-        parameters["ticket"] = self.ticket
+        #parameters["ticket"] = self.ticket
         parameters["authtoken"] = self.authtoken
         parameters["scope"] = self.scope
 
@@ -199,6 +199,45 @@ class Connection(object):
             logger.debug(response)
 
         return response
+
+    def check_successful_xml(self, response):
+        """ Make sure that we get "succefully" response.
+        
+        Throw exception of the response looks like something not liked.
+        
+        @raise: ZohoException if any error
+        
+        @return: Always True
+        """
+
+        # Example response
+        # <response uri="/crm/private/xml/Leads/insertRecords"><result><message>Record(s) added successfully</message><recorddetail><FL val="Id">177376000000142007</FL><FL val="Created Time">2010-06-27 21:37:20</FL><FL val="Modified Time">2010-06-27 21:37:20</FL><FL val="Created By">Ohtamaa</FL><FL val="Modified By">Ohtamaa</FL></recorddetail></result></response>
+
+        root = fromstring(response)
+            
+        # Check error response
+        # <response uri="/crm/private/xml/Leads/insertRecords"><error><code>4401</code><message>Unable to populate data, please check if mandatory value is entered correctly.</message></error></response>
+        for error in root.findall("error"):
+            print "Got error"
+            for message in error.findall("message"):
+                raise ZohoException(message.text)
+        
+        return True
+
+    def get_inserted_records(self, response):
+        """
+        @return: List of record ids which were created by insert recoreds
+        """
+        root = fromstring(response)
+        
+        records = []
+        for result in root.findall("result"):
+            for record in result.findall("recorddetail"):
+                record_detail = {}
+                for fl in record.findall("FL"):
+                    record_detail[fl.get("val")] = fl.text
+                records.append(record_detail)
+        return records
 
 def stringify(params):
     """ Make sure all params are urllib compatible strings """

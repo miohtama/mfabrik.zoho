@@ -178,7 +178,7 @@ class Connection(object):
         """
         # Do not mutate orginal dict
         parameters = parameters.copy()
-        #parameters["ticket"] = self.ticket
+        parameters["ticket"] = self.ticket
         parameters["authtoken"] = self.authtoken
         parameters["scope"] = self.scope
 

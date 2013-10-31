@@ -4,8 +4,8 @@
 
 """
 
-__copyright__ = "2013 Local Motors,  mFabrik Research Oy"
-__author__ = "Vincent Prime <vprime@local-motors.com>, Mikko Ohtamaa <mikko@mfabrik.com>"
+__copyright__ = "2013 mFabrik Research Oy"
+__author__ = "Vincent Prime <myself@vincentprime.com>, Mikko Ohtamaa <mikko@mfabrik.com>"
 __license__ = "GPL"
 __docformat__ = "Epytext"
 

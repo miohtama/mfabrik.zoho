@@ -55,8 +55,7 @@ class Connection(object):
     Subclass this and override necessary methods to support different Zoho API groups.
     """
 
-
-    def __init__(self, username, password, authtoken, scope, extra_auth_params = {}, auth_url="https://accounts.zoho.com/login"):
+    def __init__(self, **kwargs):
         """
         @param username: manifisto@mfabrik.com
 
@@ -66,15 +65,29 @@ class Connection(object):
 
         @param extra_auth_params: Dictionary of optional HTTP POST parameters passed to the login call
 
-
         @param auth_url: Which URL we use for authentication
         """
-        self.username = username
-        self.password = password
-        self.authtoken = authtoken
-        self.scope = scope
-        #
-        self.auth_url = None
+        options = {
+            'username': None,
+            'password': None,
+            'authtoken': None,
+            'auth_url': "https://accounts.zoho.com/login",
+            'scope': None
+        }
+        options.update(kwargs)
+        if options['username'] is not None and options['password'] is not None:
+            self.username = options["username"]
+            self.password = options['password']
+
+        if options['authtoken']:
+            self.authtoken = options["authtoken"]
+
+        self.auth_url = options['auth_url']
+
+        if options['scope'] is not None:
+            self.scope = options["scope"]
+        else:
+            raise ZohoException("No Scope")
 
         # Ticket is none until the conneciton is opened
         self.ticket = None
@@ -149,9 +162,11 @@ class Connection(object):
 
     def ensure_opened(self):
         """ Make sure that the Zoho Connection is correctly opened """
-
-        if self.ticket is None:
-            raise ZohoException("Need to initialize Zoho ticket first")
+        if hasattr(self, 'username') and hasattr(self, 'password') and not hasattr(self, 'authtoken'):
+            if self.ticket is None:
+                raise ZohoException("Need to initialize Zoho ticket first")
+        else:
+            return
 
     def do_xml_call(self, url, parameters, root):
         """  Do Zoho API call with outgoing XML payload.
@@ -178,7 +193,8 @@ class Connection(object):
         """
         # Do not mutate orginal dict
         parameters = parameters.copy()
-        parameters["ticket"] = self.ticket
+        if self.ticket != None:
+            parameters["ticket"] = self.ticket
         parameters["authtoken"] = self.authtoken
         parameters["scope"] = self.scope
 
@@ -189,7 +205,8 @@ class Connection(object):
             logger.debug("Doing ZOHO API call:" + url)
             for key, value in parameters.items():
                 logger.debug(key + ": " + value)
-
+        self.parameters = parameters
+        self.parameters_encoded = urllib.urlencode(parameters)
         request = urllib2.Request(url, urllib.urlencode(parameters))
         response = urllib2.urlopen(request).read()
 
@@ -218,6 +235,8 @@ class Connection(object):
         # Check error response
         # <response uri="/crm/private/xml/Leads/insertRecords"><error><code>4401</code><message>Unable to populate data, please check if mandatory value is entered correctly.</message></error></response>
         for error in root.findall("error"):
+            parameters = self.parameters
+            parameters_encoded = self.parameters_encoded
             print "Got error"
             for message in error.findall("message"):
                 raise ZohoException(message.text)

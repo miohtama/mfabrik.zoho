@@ -23,7 +23,7 @@ Features
 *mfabrik.zoho* is intended to use for machine-to-machine communication and
 will work with any web framework, like Plone, Django, Google App Engine.
 
-To communicate with Zoho you need username, password and API KEY.
+To communicate with Zoho you need username, password or API KEY.
 For further information, see *Setup > Admin > Developer key* in 
 your Zoho application.
 
@@ -33,6 +33,7 @@ API support
 Currently out of box support includes:
 
 * CRM apis: insert_records, get_records, delete_lead
+* Support API: add_records
 
 You can easily wrap Zoho API calls you need using this library.
 Please contribute patches to the package.
@@ -58,43 +59,105 @@ To learn how to use this library, it is best to study its unit test source code 
 
 Example usage::
 
-        # Import CRM connector class
+        # Import CRM connector class for Zoho CRM
         from mfabrik.zoho.crm import CRM
+        # Import Support connector class for Zoho Support
+        from mfabrik.zoho.crm import SUPPORT
+        # (optional) Use to raise a ZohoException in your application.
         from mfabrik.zoho.core import ZohoException
 
         # Initialize Zoho CRM API connection
-        # You need valid Zoho credentials and API key for this.
+        # You need valid Zoho API key for this.
         # You get necessary data from Zoho > Setup > Admin > Developer key
-        crm = CRM(username="myusername", password="foobar", apikey="12312312312312312323")
+        crm = CRM(authtoken="authtoken", scope="crmapi")
+        # same for support
+        support = SUPPORT(authtoken="authtoken", scope="supportapi")
 
-        # Open connection can be used to make as many as possible API calls
-        # This will raise ZohoException if credentials are incorrect.
-        # Also IOError or URLError will be raised if you the connection to Zoho servers
-        # does not work.
+        # If you're going to use session tickets, include a username and password 
+        # Then run MODULE.open() to generate the session ticket.
+        # This functionality is currently Deprecated for CRM & Support and will cause a 4500 error
+        # It might be available with other Zoho API's
+        crm = CRM(username="myusername", password="foobar", authtoken="12312312312312312323", scope="crmapi")
         crm.open()
-
-        # Lead is just a bunch of dictionaried data
-        # For possible lead parameters see crm.py.
         
-        # Zoho default compulsory fields: Last Name, Company
+
+CRM input example::
+
+        # Input is just a bunch of dictionaried data
+        # For possible parameters see https://www.zoho.com/crm/help/api/insertrecords.html
+        # To discover required fields in CRM, log into zoho and visit Setup > Customization > Layouts
+        # Everything marked with red, or with a padlock is a required field.
+        
+        # Zoho default compulsory fields for Leads: Last Name, Company
         
         lead = {
             u"First Name" : u"Mikko",
             u"Last Name" : u"Ohtamaa",
             u"Company" : u"mFabrik Research Oy"   
         }
+        # Special fields *Lead Owner* must be the Email of the CRM user.
 
         # Insert a new lead to Zoho CRM lead database.
         # We support multiple leads per call, so we need to listify our one lead first.
-        responses = crm.insert_records([lead]) # This will raise ZohoException if lead data is invalid
-        
+        responses = crm.insert_records('Leads',[lead]) # This will raise ZohoException if lead data is invalid
+
+        # To insert records attached to a parent record, like a Product on a SalesOrder
+        # This functionality is currently only written for the CRM. 
+        SalesOrders = {
+            'Subject': "Subjuct is required", # Subject is required
+            'Sales Order Owner': "you@youremail.com", # Must be the registered Email for the CRM user
+            'Contact Name': Zoho ID from either Leads, Contacts, OR a string containing the Full Contact Name.
+            'Sub Total': "100",
+            'Tax': "5",
+            'Adjustment':"5",
+            'Grand Total': "110",
+            'Billing Street': "123 Fake Street",
+            'Shipping Street': "123 Fake Street",
+            'Billing City': "San Francisco",
+            'Shipping City': "San Francisco",
+            'Billing State': "CA",
+            'Shipping State': "CA",
+            'Billing Code': "90001",
+            'Shipping Code': "90001",
+            'Billing Country': "US",
+            'Shipping Country': "US",
+            'Product Details':{ # Add a For Each, add a list full of dictionaries contaning at least a Product Id
+                'product': [
+                    {
+                        'Product Id': '1470000001', # The Zoho ID from the item in the "Products" module
+                        'Product Name': "Foo",
+                        'Qty': "20",
+                        'Unit Price': "10",
+                        'List Price': "10",
+                        'Total': "200",
+                        'Discount': "100",
+                        'Total After Discount':"100",
+                        'Net Total':"100",
+                    },
+                ],
+            },
+        }
+        response = crm.insert_records('SalesOrders', [SalesOrders])
+
         # list of responses. one response is {'Modified Time': '2010-10-07 13:24:49', 'Created By': 'Developer', 'Modified By': 'Developer', 'Id': '177376000000253053', 'Created Time': '2010-10-07 13:24:49'}
         # At least one response is guaranteed, otherwise an exception is raised
         
         lead_id = responses[0]["Id"]
-        
+            
 
-Special field *Lead Owner* must be the registered email fo Zoho CRM user.        
+Support input example::
+
+        incomingData = {
+            'Contact Name': 'John Doe',
+            'Email': 'jdoe@example.com',
+            'Phone': '555-555-1234',
+            'Classification': 'Software Issue',
+            'Subject': 'Support request subject here',
+            'Description': 'Body of the support request text.'
+        }
+        response = support.add_records([incomingData], 'Department Name', 'Portal Name')
+        record_id = response[0]["Id"]
+  
         
         
 .. note::

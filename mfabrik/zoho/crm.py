@@ -12,11 +12,11 @@ __docformat__ = "Epytext"
 
 try:
     from xml import etree
-    from xml.etree.ElementTree import Element, tostring, fromstring
+    from xml.etree.ElementTree import Element, tostring, fromstring, SubElement
 except ImportError:
     try:
         from lxml import etree
-        from lxml.etree import Element, tostring, fromstring
+        from lxml.etree import Element, tostring, fromstring, SubElement
     except ImportError:
         raise RuntimeError("XML library not available:  no etree, no lxml")
    
@@ -32,7 +32,7 @@ class CRM(Connection):
         """ Called by base class """
         return "ZohoCRM"
     
-    def insert_records(self, leads, extra_post_parameters={}):
+    def insert_records(self, module, leads, extra_post_parameters={}):
         """ Insert new leads to Zoho CRM database.
         
         The contents of the lead parameters can be defined in Zoho CRM itself.
@@ -46,11 +46,10 @@ class CRM(Connection):
             Described in Zoho CRM API.
         
         @return: List of record ids which were created by insert recoreds
-        """        
-
+        """
         self.ensure_opened()
         
-        root = Element("Leads")
+        root = Element(module)
 
         # Row counter
         no = 1
@@ -64,9 +63,22 @@ class CRM(Connection):
             for key, value in lead.items():
                 # <FL val="Lead Source">Web Download</FL>
                 # <FL val="First Name">contacto 1</FL>
-                fl = Element("fl", val=key)
-                fl.text = value
+                fl = Element("FL", val=key)
+                if type(value) == dict: # If it's an attached module, accept multiple groups
+                    mod_attach_no = 1
+                    for module_key, module_value in value.items(): # The first group defines the module name, yank that and iterate through the contents
+                        for mod_item in module_value:
+                            mod_fl = SubElement(fl, module_key, no=str(mod_attach_no))
+                            for mod_item_key, mod_item_value in mod_item.items():
+                                attach_fl = SubElement(mod_fl, "FL", val=mod_item_key)
+                                attach_fl.text = mod_item_value
+                            mod_attach_no += 1
+                elif type(value) != str:
+                    fl.text = str(value)
+                else:
+                    fl.text = value
                 row.append(fl)
+
                 
             no += 1
 
@@ -77,7 +89,7 @@ class CRM(Connection):
 
         post.update(extra_post_parameters)
         
-        response = self.do_xml_call("https://crm.zoho.com/crm/private/xml/Leads/insertRecords", post, root)
+        response = self.do_xml_call("https://crm.zoho.com/crm/private/xml/" + module + "/insertRecords", post, root)
 
         self.check_successful_xml(response)
                 
@@ -98,7 +110,6 @@ class CRM(Connection):
         @return: Python list of dictionarizied leads. Each dictionary contains lead key-value pairs. LEADID column is always included.
 
         """
-        
         self.ensure_opened()
         
 
@@ -133,7 +144,6 @@ class CRM(Connection):
         
         @param parameters: Extra HTTP post parameters        
         """
-        
         self.ensure_opened()
     
         post_params = {}
